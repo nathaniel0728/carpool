@@ -1,8 +1,56 @@
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     </head>
+    
+    <script>
+        
+        $(document).ready(function(){
+            var socket = io();
+            socket.on("carpool-update", function(data){
+                for(var i = 0; i < data.length; i++)
+                    if(document.getElementById(i+"cp") == null)
+                        $("#carpools").append("<h3 id="+i+"cp>"+data[i].fname+" " + data[i].lname + "</h3>");
+            });
+
+            $("#create input[type=submit]").click(function(){
+                var fname = $("#create input[name=fname]").val();
+                var lname = $("#create input[name=lname]").val();
+                socket.emit("add-carpool", {fname:fname, lname:lname});
+            });
+
+        });
+
+    </script>
+    
+    <style>
+        html,body{
+            margin:0 auto;
+        }
+        div{
+            margin: 10px;
+        }
+    </style>
 
     <body>
         <h1>Carpool Application</h1>
+        <div id='create'>
+            <input type='text' name='fname' placeholder='First Name' />
+            <input type='text' name='lname' placeholder='Last Name' />
+            <input type='submit' placeholder='Submit Information' />
+        </div>
+        <div id='carpools'>
+            <h1>Available Carpools: </h1>
+        </div>
     </body>
 </html>
+
+
+
+
+
+
