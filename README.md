@@ -1,2 +1,3 @@
 # carpool
-Carpool Web Application
+Carpool Web Application made with NodeJS
+
