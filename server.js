@@ -1,14 +1,15 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var Carpool = require('./carpool');
 
 app.get("/", function(req, res){
     res.sendFile(__dirname + "/index.html");
 });
 
-var exampleName = {fname:"john", lname:"smith"};
+var exampleName = new Carpool("Nathaniel", "Choe", "Vienna", "Alexandria", [0, 1, 1, 1, 1, 1, 1]);
 var carpools = [exampleName];
-
+console.log(exampleName.fname());
 io.on("connection", function(socket){
     
     io.emit("carpool-update", carpools);

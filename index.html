@@ -11,18 +11,47 @@
         
         $(document).ready(function(){
             var socket = io();
-            socket.on("carpool-update", function(data){
-                for(var i = 0; i < data.length; i++)
-                    if(document.getElementById(i+"cp") == null)
-                        $("#carpools").append("<h3 id="+i+"cp>"+data[i].fname+" " + data[i].lname + "</h3>");
-            });
-
+            
+            
+            
+            
+            /*
+                Functions within #create
+            */
             $("#create input[type=submit]").click(function(){
                 var fname = $("#create input[name=fname]").val();
                 var lname = $("#create input[name=lname]").val();
                 socket.emit("add-carpool", {fname:fname, lname:lname});
             });
 
+            /*
+                Functions within #carpools
+            */
+            function createCarpoolDiv(user){
+                var name = "<h3>"+user._fname+" " +user._lname+"</h3>";
+                var loc = "<h4>"+user._loc[0]+" to "+user._loc[1]+"</h4>";
+                var days = "<h4>"+user._days+"</h4>";
+                var addPart = 
+                    "<input type='text' placeholder='Participant' />"+
+                    "<input type='text' placeholder='Days' />"+
+                    "<input type='submit' placeholder='Submit' />";
+    
+                return name+loc+days+addPart;
+            }
+            
+            socket.on("carpool-update", function(data){
+                for(var i = 0; i < data.length; i++){
+                    if($("#carpools #" + i).length <= 0){
+                        $("#carpools").append("<div id="+i+">"+createCarpoolDiv(data[i])+"</div>");
+                    }
+                }
+            });
+
+            $("#carpools input[type=submit]").click(function(){
+                
+            });
+        
+        
         });
 
     </script>
