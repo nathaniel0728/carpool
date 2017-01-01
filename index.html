@@ -3,6 +3,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        <!-- <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">-->
         <script src="//code.jquery.com/jquery-1.10.2.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     </head>
@@ -14,29 +16,58 @@
             
             
             
-            
             /*
                 Functions within #create
             */
             $("#create input[type=submit]").click(function(){
                 var fname = $("#create input[name=fname]").val();
                 var lname = $("#create input[name=lname]").val();
-                socket.emit("add-carpool", {fname:fname, lname:lname});
+                var desc = $("#create input[name=desc]").val();
+                var email = $("#create input[name=email]").val();
+                var phone = $("#create input[name=phone]").val();
+                var loc1 = $("#create input[name=loc1]").val();
+                var loc2 = $("#create input[name=loc2]").val();
+                var days = [];
+                $("#create input[type=checkbox]").each(function(index){
+                    //unavailable days = 2, claimed days = 1, unclaimed days = 0
+                    if($(this).is(":checked"))
+                        days.push(0);
+                    else
+                        days.push(2);
+                });
+                socket.emit("add-carpool", {fname:fname, lname:lname,desc:desc, email:email, phone:phone,  loc1:loc1, loc2:loc2, days:days});
             });
 
             /*
                 Functions within #carpools
             */
             function createCarpoolDiv(user){
-                var name = "<h3>"+user._fname+" " +user._lname+"</h3>";
+                var name = "<h3>Organizer: "+user._fname+" " +user._lname+"</h3>";
+                var desc = "<h4>Description: "+user._desc+"</h4>";
+                var contact = "<div id='contact'>" + 
+                                "<h4>Contact Information: </h4>" +
+                                "<h5>Email: "+user._email+"</h5>" +
+                                "<h5>Phone Number: "+user._phone+"</h5>" +
+                                "</div>";
                 var loc = "<h4>"+user._loc[0]+" to "+user._loc[1]+"</h4>";
-                var days = "<h4>"+user._days+"</h4>";
+                var days = "<div id='days'>";
+                
+                var retdays = user._days;
+                var week_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                var label_names = ["sun", "mon", "tues", "wed", "thur", "fri", "sat"];
+                for(var x = 0; x < retdays.length; x++){
+                    if(retdays[x] == 2) //disabled
+                        days += "<div id='day'><input type='checkbox' id="+label_names[x]+" disabled='disabled'/>"
+                    else
+                        days += "<div id='day'><input type='checkbox' id="+label_names[x]+"/>"
+                    days += "<label for="+label_names[x]+">"+week_names[x]+"</label></div>";
+                }
+                days += "</div>";
                 var addPart = 
                     "<input type='text' placeholder='Participant' />"+
-                    "<input type='text' placeholder='Days' />"+
                     "<input type='submit' placeholder='Submit' />";
-    
-                return name+loc+days+addPart;
+            
+                return name+desc+contact+loc+days+addPart;
             }
             
             socket.on("carpool-update", function(data){
@@ -60,16 +91,71 @@
         html,body{
             margin:0 auto;
         }
-        div{
-            margin: 10px;
+        #create{
+            margin:10px;
+        }
+        #create{
+            display:inline-block;    
+            background-color:#CCCCCC;
+        }
+        #create input[type=text], #create input[type=textarea]{
+            width:98%;
+            margin-left:1%;
+            margin-right:1%;
+        }
+        #create label, #carpools label{
+            padding-right:10px;
+        }
+
+        #carpools div{
+            display:inline-block;
+            background-color:green;
+            margin:15px;
+        }
+        #carpools #days{
+            display:inline-block;
+        }
+        #carpools #days #day{
+            display:block;
         }
     </style>
 
     <body>
-        <h1>Carpool Application</h1>
         <div id='create'>
-            <input type='text' name='fname' placeholder='First Name' />
-            <input type='text' name='lname' placeholder='Last Name' />
+            <h1>Carpool Application</h1>
+            <input type='text' name='fname' placeholder='Organizer First Name' />
+            <input type='text' name='lname' placeholder='Organizer Last Name' />
+            
+            <input type='textarea' name='desc' placeholder='Add a brief description, including timespan of carpool' />
+            <input type='text' name='email' placeholder='Email' />
+            <input type='text' name='phone' placeholder='Phone Number' />
+
+            <input type='text' name='loc1' placeholder='Starting Location' />
+            <input type='text' name='loc2' placeholder='Ending Location' />
+            
+            <h3>Check occurring dates (NOT dates that you are available)</h3>
+
+            <input type='checkbox' id='sun' />
+            <label for='sun'>Sunday</label>
+            
+            <input type='checkbox' id='mon' />
+            <label for='mon'>Monday</label>
+            
+            <input type='checkbox' id='tues' />
+            <label for='tues'>Tuesday</label>
+            
+            <input type='checkbox' id='wed' />
+            <label for='wed'>Wednesday</label>
+            
+            <input type='checkbox' id='thur' />
+            <label for='thur'>Thursday</label>
+            
+            <input type='checkbox' id='fri' />
+            <label for='fri'>Friday</label>
+            
+            <input type='checkbox' id='sat' />
+            <label for='sat'>Saturday</label>
+
             <input type='submit' placeholder='Submit Information' />
         </div>
         <div id='carpools'>
