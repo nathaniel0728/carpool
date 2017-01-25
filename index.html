@@ -64,10 +64,14 @@
                 }
                 days += "</div>";
                 var addPart = 
-                    "<input type='text' placeholder='Participant' />"+
-                    "<input type='submit' placeholder='Submit' />";
-            
-                return name+desc+contact+loc+days+addPart;
+                    "<div id='participant'>"+
+                    "<input type='text' name='fname' placeholder='First Name' />"+
+                    "<input type='text' name='lname' placeholder='Last Name' />"+
+                    "<input type='text' name='email' placeholder='Email' />"+
+                    "<input type='text' name='phone' placeholder='Phone Number' />"+
+                    "<input type='submit' placeholder='Submit' />"+
+                    "</div>";
+                return name+desc+contact+loc+days;//+addPart;
             }
             
             socket.on("carpool-update", function(data){
@@ -109,7 +113,7 @@
 
         #carpools div{
             display:inline-block;
-            background-color:green;
+            background-color:lightblue;
             margin:15px;
         }
         #carpools #days{
